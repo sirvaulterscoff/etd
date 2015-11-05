@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enhanced thread dump monitor</title>
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="static/css/page.css">
+    <script type="text/javascript" src="static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="static/js/page.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle right panel</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Enhanced thread dump</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <form class="navbar-form navbar-right">
+                <input type="button" class="btn btn-default" value="Download dump">
+                <input type="button" class="btn btn-info" value="Download 3 dumps">
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <h3 class="navheader"><span class="glyphicon glyphicon-align-left" aria-hidden="true"></span>Dump info</h3>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-xs-12 text-center">Server time:</div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 text-center" id="divTime"></div>
+                </div>
+                <div class="row callout">
+                    <div class="col-xs-6">Started:</div>
+                    <div class="col-xs-6 small" id="divStarted"></div>
+                </div>
+                <div class="row callout">
+                    <div class="col-xs-6">Daemon:</div>
+                    <div class="col-xs-6 small" id="divDaemon"></div>
+                </div>
+                <div class="row callout">
+                    <div class="col-xs-6">Peak:</div>
+                    <div class="col-xs-6 small" id="divPeak"></div>
+                </div>
+                <div class="row callout">
+                    <div class="col-xs-6">Current:</div>
+                    <div class="col-xs-6 small" id="divCurrent"></div>
+                </div>
+                <div class="row callout">
+                    <div class="col-xs-6">Runnable:</div>
+                    <div class="col-xs-6 small" id="divRunnable"></div>
+                </div>
+                <div class="row callout">
+                    <div class="col-xs-6">Blocked:</div>
+                    <div class="col-xs-6 small" id="divBlocked"></div>
+                </div>
+                <div class="row callout">
+                    <div class="col-xs-6">Waiting:</div>
+                    <div class="col-xs-6 small" id="divWaiting"></div>
+                </div>
+            </div>
+            <h3 class="navheader"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>Controls</h3>
+
+            <form class="">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="chkMonitorInfo">Monitors info
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="chkSynchInfo" disabled="disabled">Synchronization info
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="chkContention">Thread contention
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="chkCpuTime">Thread CPU time
+                    </label>
+                </div>
+            </form>
+            <h3 class="navheader"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span>Filters</h3>
+
+            <div class="btn-group" data-toggle="buttons" id="libs_packages">
+            </div>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h1 class="page-header">Dump</h1>
+
+            <div class="row thread-name-row" id="thread-template">
+                <div class="col-md-8">
+                    <span class="tstate"></span>
+                    <span class="h4"><a class="tname" href="#"></a>
+                    </span>
+                    <button type="button" class="btn btn-default btn-xs" aria-label="Refresh">
+                        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <span class="tid"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
