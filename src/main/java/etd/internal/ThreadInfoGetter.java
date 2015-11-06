@@ -13,6 +13,7 @@ import java.util.List;
  * @since 03.11.2015
  */
 public class ThreadInfoGetter {
+	private static  ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
 	public ThreadDump getThreadDump(VmInfo vmInfo) {
 		return getThreadDump(vmInfo.includeMonitors, vmInfo.synchronizerUsageSupported, vmInfo.threadContentionMonitoringEnabled, vmInfo.threadCpuTimeEnabled);
 	}
@@ -28,18 +29,16 @@ public class ThreadInfoGetter {
 	 *                                              Can only be enabled if {@link ThreadMXBean#isThreadCpuTimeSupported()}  }
 	 * @return
 	 */
-	public ThreadDump getThreadDump(
+	private ThreadDump getThreadDump(
 			boolean includeMonitors,
 			boolean isSynchronizerUsageSupported,
 			boolean isThreadContentionMonitoringSupported,
 			boolean isThreadCpuTimeSupported) {
-		ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
 		long[] deadLockThreads = isSynchronizerUsageSupported ? mxBean.findDeadlockedThreads() : new long[0];
 		List<etd.model.ThreadInfo> result = new LinkedList<>();
 		int blocked = 0, waiting = 0, runnabled = 0;
 		for (ThreadInfo systemThreadInfo : mxBean.dumpAllThreads(includeMonitors, isSynchronizerUsageSupported)) {
 			final long threadId = systemThreadInfo.getThreadId();
-			etd.model.ThreadInfo threadInfo = new etd.model.ThreadInfo(threadId, systemThreadInfo.getThreadName(), systemThreadInfo.getThreadState().name());
 			switch (systemThreadInfo.getThreadState()) {
 				case BLOCKED:
 					blocked++;
@@ -52,17 +51,7 @@ public class ThreadInfoGetter {
 					runnabled++;
 					break;
 			}
-			threadInfo
-					.setCounts(
-							systemThreadInfo.getWaitedCount(),
-							systemThreadInfo.getBlockedCount())
-					.setTimes(
-							isThreadContentionMonitoringSupported ? systemThreadInfo.getWaitedTime() : -1,
-							isThreadContentionMonitoringSupported ? systemThreadInfo.getBlockedTime() : -1,
-							isThreadCpuTimeSupported ? mxBean.getThreadCpuTime(threadId) : -1,
-							isThreadCpuTimeSupported ? mxBean.getThreadUserTime(threadId) : -1
-					)
-					.setStackTrace(systemThreadInfo.getStackTrace());
+			etd.model.ThreadInfo threadInfo = getThreadInfo(isThreadContentionMonitoringSupported, isThreadCpuTimeSupported, systemThreadInfo);
 			result.add(threadInfo);
 		}
 
@@ -78,4 +67,25 @@ public class ThreadInfoGetter {
 				.setDeadlocks(deadLockThreads);
 	}
 
+	public String getThreadStack(VmInfo vmInfo, String threadId) {
+		ThreadInfo systemThreadInfo = mxBean.getThreadInfo(Long.valueOf(threadId), Integer.MAX_VALUE);
+		return getThreadInfo(vmInfo.threadContentionMonitoringEnabled, vmInfo.threadCpuTimeEnabled, systemThreadInfo).toJSON();
+	}
+
+	private etd.model.ThreadInfo getThreadInfo(boolean isThreadContentionMonitoringSupported, boolean isThreadCpuTimeSupported, ThreadInfo systemThreadInfo) {
+		long threadId = systemThreadInfo.getThreadId();
+		etd.model.ThreadInfo threadInfo = new etd.model.ThreadInfo(threadId, systemThreadInfo.getThreadName(), systemThreadInfo.getThreadState().name());
+		threadInfo
+				.setCounts(
+						systemThreadInfo.getWaitedCount(),
+						systemThreadInfo.getBlockedCount())
+				.setTimes(
+						isThreadContentionMonitoringSupported ? systemThreadInfo.getWaitedTime() : -1,
+						isThreadContentionMonitoringSupported ? systemThreadInfo.getBlockedTime() : -1,
+						isThreadCpuTimeSupported ? mxBean.getThreadCpuTime(threadId) : -1,
+						isThreadCpuTimeSupported ? mxBean.getThreadUserTime(threadId) : -1
+				)
+				.setStackTrace(systemThreadInfo.getStackTrace());
+		return threadInfo;
+	}
 }

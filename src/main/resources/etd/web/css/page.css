@@ -134,3 +134,7 @@ h3 > span {
 	font-size: large;
 	/*border: 1px dotted #ccc;*/
 }
+.btn-xss {
+	font-size: 10px;
+	padding: 2px 5px 2px 5px;
+}

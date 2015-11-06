@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  */
 public class RestProcessor {
 	static final Logger LOG = Logger.getLogger(RestProcessor.class.getName());
-	public static final Pattern PATTERN = Pattern.compile("(?<grp>[a-zA-z]{3,})/?((?<mtd>[a-zA-Z]{2,})/(?<data>[a-zA-Z\\d]*))?");
+	public static final Pattern PATTERN = Pattern.compile("([a-zA-Z]+)/?(([a-zA-Z\\d]+)/([a-zA-Z\\d]+)?)?");
 	private String result;
 
 	public RestProcessor(String requestType, String restUri, ThreadDumpServletConfig servletConfig) {
@@ -27,15 +27,15 @@ public class RestProcessor {
 
 		Preconditions.checkTrue(matcher.matches(), "Wrong request to REST API");
 
-		String group = matcher.group("grp");
-		String methodStr = matcher.group("mtd");
-		String dataStr = matcher.group("data");
+		String group = matcher.group(1);
+		String id1Str = matcher.group(3);
+		String id2Str = matcher.group(4);
 
 		Preconditions.checkNotNull(group, "Wrong request to REST");
 
 		try {
 			Method method = this.getClass().getDeclaredMethod(requestType.toLowerCase() + group.substring(0, 1).toUpperCase() + group.substring(1), ThreadDumpServletConfig.class, String.class, String.class);
-			result = (String) method.invoke(this, servletConfig, methodStr, dataStr);
+			result = (String) method.invoke(this, servletConfig, id1Str, id2Str);
 		} catch (NoSuchMethodException e) {
 			result = JSON.renderError("Method %s not found on REST API", group);
 			LOG.log(Level.SEVERE, "Method not found on REST API", e);
@@ -60,7 +60,10 @@ public class RestProcessor {
 		return JSON.ok();
 	}
 
-	public String getStacks(ThreadDumpServletConfig servletConfig, String ignore, String ingored) {
+	public String getStacks(ThreadDumpServletConfig servletConfig, String threadId, String ingored) {
+		if(threadId != null) {
+			return new ThreadInfoGetter().getThreadStack(VmInfo.getVmInfo(), threadId);
+		}
 		final VmInfo vmInfo = VmInfo.getVmInfo();
 		return new ThreadInfoGetter().getThreadDump(vmInfo).toJSON();
 	}

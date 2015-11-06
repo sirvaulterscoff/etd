@@ -7,6 +7,22 @@ var colors = 3;
 	function RestClient() {
 		var that = this;
 
+		this.doRestGet = function(group, mtd, callback) {
+			var _url = "rest/" + group;
+			if(mtd) {
+				_url += "/" + mtd + "/";
+			}
+			jq.ajax({
+				url: _url
+			}).then(function (data) {
+				if (data["err"]) {
+					alert(data["err"]);
+				} else {
+					callback(data);
+				}
+			});
+		}
+
 		function doRestPut(group, mtd, data) {
 			var _url = "rest/" + group + "/" + mtd + "/" + data;
 			jq.ajax({
@@ -20,10 +36,6 @@ var colors = 3;
 		}
 
 		this.onFillVmInfoData = function (data) {
-			if (data["err"]) {
-				alert(data["err"]);
-				return;
-			}
 			var chkMonitorInfo = jq('#chkMonitorInfo');
 			chkMonitorInfo.prop("disabled", data["monitorUsageSupported"] == "false");
 			chkMonitorInfo.change(function () {
@@ -47,10 +59,10 @@ var colors = 3;
 			});
 		};
 
-		this.parseThreadLine = function (thread) {
+		this.parseThreadLine = function (thread, after) {
 			var originalHeader = jq("#thread-template");
 			var clonedRow = originalHeader.clone(true);
-			clonedRow.insertAfter(originalHeader);
+			clonedRow.insertAfter(after ? after : originalHeader);
 			clonedRow.attr("tid", thread.header.id);
 			clonedRow.prop("id", "thread-" + thread.header.id);
 			clonedRow.show();
@@ -89,6 +101,10 @@ var colors = 3;
 					thread.times.cpu, thread.times.userCpu);
 			jq(".tid", clonedRow).text(extInfo);
 
+			var refreshButton = jq('.trefresh', clonedRow);
+			refreshButton.click(that.onRefreshClick);
+			refreshButton.attr('tid', thread.header.id);
+
 			var previousPackage;
 			var groupRow;
 			var afterGroupTag = false;
@@ -123,6 +139,7 @@ var colors = 3;
 										class: "row package-stub-header " + colorCssClass
 									});
 									stubHeader.attr("pkgid", colorNum);
+									stubHeader.attr("tid", thread.header.id);
 									var stubBodyHolder = jq('<div>', {
 										class: 'col-md-8 package-stub-x'
 									}).appendTo(stubHeader);
@@ -144,6 +161,7 @@ var colors = 3;
 					rootRowTag.attr("pkgid", -1);
 				}
 				rootRowTag.insertAfter(groupRow ? groupRow : clonedRow);
+				rootRowTag.attr("tid", thread.header.id);
 			});
 		};
 		this.packageMatches = function (line) {
@@ -153,10 +171,6 @@ var colors = 3;
 		};
 
 		this.parseStacks = function (data) {
-			if (data["err"]) {
-				alert(data["err"]);
-				return;
-			}
 			var info = data["info"];
 			jq("#divTime").text(info["createdOn"]);
 			jq("#divStarted").text(info["started"]);
@@ -167,14 +181,10 @@ var colors = 3;
 			jq("#divRunnable").text(info.runnable + " (" + percent(totalThreads, info.runnable) + ")");
 			jq("#divBlocked").text(info.blocked + " (" + percent(totalThreads, info.blocked) + ")");
 			jq("#divWaiting").text(info.waiting + " (" + percent(totalThreads, info.waiting) + ")");
-			data["threads"].forEach(that.parseThreadLine);
+			data["threads"].forEach(function(line) { that.parseThreadLine(line, null);});
 		};
 
 		this.parsePrefs = function (data) {
-			if (data["err"]) {
-				alert(data["err"]);
-				return;
-			}
 			localPackageNames = data.local;
 			var packageTag = jq('#libs_packages');
 			libs = {};
@@ -217,24 +227,37 @@ var colors = 3;
 					}
 				});
 			}
+		};
+
+		this.parseStack = function(thread) {
+			var tid = "[tid=" + thread.header.id + "]";
+			var rootRow = jq(".thread-name-row" + tid);
+			var insertAfter = rootRow.prev();
+			rootRow.remove();
+			jq(".package-stub-header" + tid).remove();
+			jq(".trace-elem" + tid).remove();
+			that.parseThreadLine(thread, insertAfter);
+
 		}
+
+		this.onRefreshClick = function() {
+			that.getStack(jq(this).attr('tid'));
+		};
 	}
 
 	RestClient.prototype.fillVmInfo = function () {
-		jq.ajax({
-			url: "rest/vmInfo"
-		}).then(this.onFillVmInfoData);
+		this.doRestGet("vmInfo", null, this.onFillVmInfoData)
 	};
 	RestClient.prototype.getStacks = function () {
-		jq.ajax({
-			url: "rest/stacks"
-		}).then(this.parseStacks);
+		this.doRestGet("stacks", null, this.parseStacks)
 	};
 	RestClient.prototype.getPreferences = function () {
-		jq.ajax({
-			url: "rest/prefs"
-		}).then(this.parsePrefs);
+		this.doRestGet("prefs", null, this.parsePrefs)
 	};
+	RestClient.prototype.getStack = function (threadid) {
+		this.doRestGet("stacks", threadid, this.parseStack);
+
+	}
 
 	jq(function () {
 		//get VM info
