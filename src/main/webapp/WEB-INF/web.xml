@@ -18,6 +18,10 @@
 			</param-value>
 		</init-param>
 	</servlet>
+	<filter>
+		<filter-name>demoFilter</filter-name>
+		<filter-class>etd.demo.DemoFilter</filter-class>
+	</filter>
 	<servlet-mapping>
 		<servlet-name>thread-dump</servlet-name>
 		<url-pattern>/thread-dump/*</url-pattern>
