@@ -36,6 +36,8 @@ public class ThreadInfo implements JSONObject {
 	private long threadCpuTime;
 	private long threadUserTime;
 
+	private boolean deadlocked = false;
+
 	public ThreadInfo(long threadId, String threadName, String state) {
 		this.threadId = threadId;
 		this.threadName = threadName;
@@ -63,7 +65,7 @@ public class ThreadInfo implements JSONObject {
 						"times",
 						"stack"},
 				new Object[]{
-						JSON.writePairs(new String[]{"id", "name", "state"}, new Object[]{threadId, threadName, state}),
+						JSON.writePairs(new String[]{"id", "name", "state", "deadlocked"}, new Object[]{threadId, threadName, state, deadlocked}),
 						JSON.writePairs(new String[]{"wait", "block"}, new Object[]{waitCount, blockCount}),
 						JSON.writePairs(new String[]{"wait", "block", "cpu", "userCpu"}, new Object[]{
 								toReadableTime(waitedTime, TimeUnit.MILLISECONDS),
@@ -106,5 +108,9 @@ public class ThreadInfo implements JSONObject {
 			stackElement.setTraceLine(nativeStackTraceElement.toString());
 			stackElements.add(stackElement);
 		}
+	}
+
+	public void setDeadlocked(boolean deadlocked) {
+		this.deadlocked = deadlocked;
 	}
 }

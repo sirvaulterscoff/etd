@@ -13,7 +13,8 @@ import java.util.List;
  * @since 03.11.2015
  */
 public class ThreadInfoGetter {
-	private static  ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
+	private static ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
+
 	public ThreadDump getThreadDump(VmInfo vmInfo) {
 		return getThreadDump(vmInfo.includeMonitors, vmInfo.synchronizerUsageSupported, vmInfo.threadContentionMonitoringEnabled, vmInfo.threadCpuTimeEnabled);
 	}
@@ -51,7 +52,7 @@ public class ThreadInfoGetter {
 					runnabled++;
 					break;
 			}
-			etd.model.ThreadInfo threadInfo = getThreadInfo(isThreadContentionMonitoringSupported, isThreadCpuTimeSupported, systemThreadInfo);
+			etd.model.ThreadInfo threadInfo = getThreadInfo(isThreadContentionMonitoringSupported, isThreadCpuTimeSupported, systemThreadInfo, deadLockThreads);
 			result.add(threadInfo);
 		}
 
@@ -69,12 +70,21 @@ public class ThreadInfoGetter {
 
 	public String getThreadStack(VmInfo vmInfo, String threadId) {
 		ThreadInfo systemThreadInfo = mxBean.getThreadInfo(Long.valueOf(threadId), Integer.MAX_VALUE);
-		return getThreadInfo(vmInfo.threadContentionMonitoringEnabled, vmInfo.threadCpuTimeEnabled, systemThreadInfo).toJSON();
+		long[] deadLockThreads = vmInfo.synchronizerUsageSupported ? mxBean.findDeadlockedThreads() : new long[0];
+		return getThreadInfo(vmInfo.threadContentionMonitoringEnabled, vmInfo.threadCpuTimeEnabled, systemThreadInfo, deadLockThreads).toJSON();
 	}
 
-	private etd.model.ThreadInfo getThreadInfo(boolean isThreadContentionMonitoringSupported, boolean isThreadCpuTimeSupported, ThreadInfo systemThreadInfo) {
+	private etd.model.ThreadInfo getThreadInfo(boolean isThreadContentionMonitoringSupported, boolean isThreadCpuTimeSupported, ThreadInfo systemThreadInfo, long[] deadLockThreads) {
 		long threadId = systemThreadInfo.getThreadId();
 		etd.model.ThreadInfo threadInfo = new etd.model.ThreadInfo(threadId, systemThreadInfo.getThreadName(), systemThreadInfo.getThreadState().name());
+		if(deadLockThreads != null) {
+			for (long deadLockThread : deadLockThreads) {
+				if (deadLockThread == threadId) {
+					threadInfo.setDeadlocked(true);
+					break;
+				}
+			}
+		}
 		threadInfo
 				.setCounts(
 						systemThreadInfo.getWaitedCount(),
@@ -86,6 +96,8 @@ public class ThreadInfoGetter {
 						isThreadCpuTimeSupported ? mxBean.getThreadUserTime(threadId) : -1
 				)
 				.setStackTrace(systemThreadInfo.getStackTrace());
+		//((ThreadImpl) mxBean).jvm.getSafepointSyncTime()
+		//((ThreadImpl) mxBean).jvm.getTotalSafepointTime()
 		return threadInfo;
 	}
 }

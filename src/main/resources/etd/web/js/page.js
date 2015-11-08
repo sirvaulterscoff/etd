@@ -3,6 +3,7 @@ var localPackageNames = [];
 var libs = {};
 var colorMap = {};
 var colors = 3;
+var deadlocked = [];
 (function (jq) {
 	function RestClient() {
 		var that = this;
@@ -94,6 +95,14 @@ var colors = 3;
 			var aTag = jq(".tname", clonedRow);
 			aTag.text(thread.header.name);
 			aTag.prop("href", "#" + thread.header.id);
+
+			if (thread.header.deadlocked=="true") {
+				var deadLockLabel = jq('<span>', {
+					class: "label label-danger"
+				});
+				deadLockLabel.text("deadlock");
+				deadLockLabel.insertAfter(aTag);
+			}
 
 			var extInfo = String.format("id: {0}, block: cnt {1} time {2}, wait: cnt {3} time {4}, cpu: {5} user {6}", thread.header.id,
 					thread.counts.block, thread.times.block,
@@ -193,6 +202,7 @@ var colors = 3;
 			data["threads"].forEach(function (line) {
 				that.parseThreadLine(line, null);
 			});
+			deadlocked = data.deadlocks;
 		};
 
 		this.parsePrefs = function (data) {
@@ -229,12 +239,13 @@ var colors = 3;
 				checkBox.change(function () {
 					var $this = jq(this);
 					var colorNum = $this.attr("pkgid");
+					var condition = "[pkgid='" + colorNum + "']";
 					if ($this.prop("checked")) {
-						jq(".trace-elem[pkgid='" + colorNum + "']").hide();
-						jq(".package-stub-header[pkgid='" + colorNum + "'").show();
+						jq(".trace-elem" + condition).hide();
+						jq(".package-stub-header" + condition).show();
 					} else {
-						jq(".trace-elem[pkgid='" + colorNum + "']").show();
-						jq(".package-stub-header[pkgid='" + colorNum + "'").hide();
+						jq(".trace-elem" + condition).show();
+						jq(".package-stub-header" + condition).hide();
 					}
 				});
 			}
