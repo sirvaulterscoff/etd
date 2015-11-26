@@ -1,7 +1,6 @@
 package etd.internal;
 
 import etd.rest.JSON;
-import sun.awt.motif.MFontConfiguration;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;

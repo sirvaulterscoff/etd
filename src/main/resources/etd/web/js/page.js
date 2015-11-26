@@ -98,7 +98,7 @@ var deadlocked = [];
 
 			if (thread.header.deadlocked=="true") {
 				var deadLockLabel = jq('<span>', {
-					class: "label label-danger"
+					"class": "label label-danger"
 				});
 				deadLockLabel.text("deadlock");
 				deadLockLabel.insertAfter(aTag);
@@ -116,14 +116,13 @@ var deadlocked = [];
 
 			var previousPackage;
 			var groupRow;
-			var afterGroupTag = false;
 			var checkboxGroup = jq('#libs_packages');
 			thread.stack.reverse().forEach(function (stackElem) {
 				var rootRowTag = jq("<div>", {
-					class: "row trace-elem"
+					"class": "row trace-elem"
 				});
 				var holder = jq('<div>', {
-					class: "col-md-8"
+					"class": "col-md-8"
 				}).appendTo(rootRowTag);
 				jq("<span>", {
 					text: stackElem.line
@@ -147,12 +146,12 @@ var deadlocked = [];
 									previousPackage = currentPackage;
 									//that.createStub()
 									var stubHeader = jq("<div>", {
-										class: "row package-stub-header " + colorCssClass
+										"class": "row package-stub-header " + colorCssClass
 									});
 									stubHeader.attr("pkgid", colorNum);
 									stubHeader.attr("tid", thread.header.id);
 									var stubBodyHolder = jq('<div>', {
-										class: 'col-md-8 package-stub-x'
+										"class": 'col-md-8 package-stub-x'
 									}).appendTo(stubHeader);
 									jq('<span>', {
 										text: currentPackage
@@ -222,7 +221,7 @@ var deadlocked = [];
 
 				//create filter holders
 				var holder = jq('<label>', {
-					class: "btn btn-primary"
+					"class": "btn btn-primary"
 				});
 				var checkBox = jq('<input>', {
 					type: "checkbox",
@@ -251,11 +250,11 @@ var deadlocked = [];
 			}
 			//create button for unknown stack elements
 			var btnHolder = jq('<label>', {
-				class: "btn btn-primary"
+				"class": "btn btn-primary"
 			});
 			var checkBox_unknown = jq('<input>', {
 				type: "checkbox",
-				class: "unknown_package"
+				"class": "unknown_package"
 			});
 			checkBox_unknown.appendTo(btnHolder);
 			btnHolder.append("Unmaped");

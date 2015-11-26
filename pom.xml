@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>etc</groupId>
-	<artifactId>web</artifactId>
+	<groupId>etd</groupId>
+	<artifactId>etd</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<properties>
 		<jettyVersion>8.1.16.v20140903</jettyVersion>
@@ -39,6 +39,43 @@
 				<configuration>
 					<reload>automatic</reload>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.samaxes.maven</groupId>
+				<artifactId>minify-maven-plugin</artifactId>
+				<version>1.7.4</version>
+				<executions>
+					<execution>
+						<id>default-minify</id>
+						<configuration>
+                            <verbose>true</verbose>
+                            <cssSourceDir>css</cssSourceDir>
+                            <cssSourceIncludes>
+                                <cssSourceInclude>*.css</cssSourceInclude>
+                            </cssSourceIncludes>
+                            <cssSourceExcludes>
+                                <cssSourceExclude>*.min.css</cssSourceExclude>
+                            </cssSourceExcludes>
+
+                           <jsSourceDir>js</jsSourceDir>
+                            <jsSourceIncludes>
+                                <jsSourceInclude>*.js</jsSourceInclude>
+                            </jsSourceIncludes>
+                            <jsSourceExcludes>
+                                <jsSourceExclude>**/*.min.js</jsSourceExclude>
+                            </jsSourceExcludes>
+                            <skipMerge>true</skipMerge>
+                            <webappSourceDir>${project.basedir}/src/main/resources/etd/web</webappSourceDir>
+                            <webappTargetDir>${build.outputDirectory}</webappTargetDir>
+                            <jsTargetDir>etd/web/js</jsTargetDir>
+                            <cssTargetDir>etd/web/css</cssTargetDir>
+                            <nosuffix>true</nosuffix>
+						</configuration>
+						<goals>
+							<goal>minify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
