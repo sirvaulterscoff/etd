@@ -9,6 +9,7 @@
 	<version>1.0-SNAPSHOT</version>
 	<properties>
 		<jettyVersion>8.1.16.v20140903</jettyVersion>
+        <minify>process-resources</minify>
 	</properties>
 
 	<dependencies>
@@ -18,8 +19,20 @@
 			<version>2.5</version>
 		</dependency>
 	</dependencies>
+    <profiles>
+        <profile>
+            <id>nomini</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <minify>none</minify>
+            </properties>
+        </profile>
+    </profiles>
 
 	<build>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -47,6 +60,7 @@
 				<executions>
 					<execution>
 						<id>default-minify</id>
+                        <phase>${minify}</phase>
 						<configuration>
                             <verbose>true</verbose>
                             <cssSourceDir>css</cssSourceDir>
