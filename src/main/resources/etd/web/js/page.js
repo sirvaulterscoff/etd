@@ -227,6 +227,27 @@ var colors = 3;
 					}
 				});
 			}
+			//create button for unknown stack elements
+			var holder = jq('<label>', {
+				class: "btn btn-primary"
+			});
+			var checkBox_unknown = jq('<input>', {
+				type: "checkbox",
+				id: "unknown_package"
+			});
+			checkBox.appendTo(holder);
+			holder.append("Unmaped");
+			holder.appendTo(packageTag);
+			checkBox.change(function () {
+				var $this = jq(this);
+				if ($this.prop("checked")) {
+					jq(".trace-elem[pkgid='-1']").hide();
+					jq(".package-stub-header[pkgid='-1'").show();
+				} else {
+					jq(".trace-elem[pkgid='-1']").show();
+					jq(".package-stub-header[pkgid='-1'").hide();
+				}
+			});
 		};
 
 		this.parseStack = function(thread) {
