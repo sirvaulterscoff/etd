@@ -7,9 +7,9 @@ var colors = 3;
 	function RestClient() {
 		var that = this;
 
-		this.doRestGet = function(group, mtd, callback) {
+		this.doRestGet = function (group, mtd, callback) {
 			var _url = "rest/" + group;
-			if(mtd) {
+			if (mtd) {
 				_url += "/" + mtd + "/";
 			}
 			jq.ajax({
@@ -108,6 +108,7 @@ var colors = 3;
 			var previousPackage;
 			var groupRow;
 			var afterGroupTag = false;
+			var checkboxGroup = jq('#libs_packages');
 			thread.stack.reverse().forEach(function (stackElem) {
 				var rootRowTag = jq("<div>", {
 					class: "row trace-elem"
@@ -132,6 +133,7 @@ var colors = 3;
 								holder.addClass(colorCssClass);
 								packageMatched = true;
 								rootRowTag.attr("pkgid", colorNum);
+								var packageCheckBox = jq('input[pkgid="' + colorNum + '"]', checkboxGroup);
 								if (!previousPackage || previousPackage != currentPackage) {
 									previousPackage = currentPackage;
 									//that.createStub()
@@ -149,6 +151,10 @@ var colors = 3;
 									stubHeader.insertAfter(clonedRow);
 									groupRow = stubHeader;
 								}
+								if (packageCheckBox.prop("checked") && groupRow) {
+									groupRow.show();
+									rootRowTag.hide();
+								}
 							}
 						}
 					}
@@ -159,6 +165,9 @@ var colors = 3;
 					groupRow = null;
 					previousPackage = null;
 					rootRowTag.attr("pkgid", -1);
+					if (jq("input.unknown_package", checkboxGroup).prop("checked")) {
+						rootRowTag.hide();
+					}
 				}
 				rootRowTag.insertAfter(groupRow ? groupRow : clonedRow);
 				rootRowTag.attr("tid", thread.header.id);
@@ -181,7 +190,9 @@ var colors = 3;
 			jq("#divRunnable").text(info.runnable + " (" + percent(totalThreads, info.runnable) + ")");
 			jq("#divBlocked").text(info.blocked + " (" + percent(totalThreads, info.blocked) + ")");
 			jq("#divWaiting").text(info.waiting + " (" + percent(totalThreads, info.waiting) + ")");
-			data["threads"].forEach(function(line) { that.parseThreadLine(line, null);});
+			data["threads"].forEach(function (line) {
+				that.parseThreadLine(line, null);
+			});
 		};
 
 		this.parsePrefs = function (data) {
@@ -228,29 +239,27 @@ var colors = 3;
 				});
 			}
 			//create button for unknown stack elements
-			var holder = jq('<label>', {
+			var btnHolder = jq('<label>', {
 				class: "btn btn-primary"
 			});
 			var checkBox_unknown = jq('<input>', {
 				type: "checkbox",
-				id: "unknown_package"
+				class: "unknown_package"
 			});
-			checkBox.appendTo(holder);
-			holder.append("Unmaped");
-			holder.appendTo(packageTag);
-			checkBox.change(function () {
+			checkBox_unknown.appendTo(btnHolder);
+			btnHolder.append("Unmaped");
+			btnHolder.appendTo(packageTag);
+			checkBox_unknown.change(function () {
 				var $this = jq(this);
 				if ($this.prop("checked")) {
 					jq(".trace-elem[pkgid='-1']").hide();
-					jq(".package-stub-header[pkgid='-1'").show();
 				} else {
 					jq(".trace-elem[pkgid='-1']").show();
-					jq(".package-stub-header[pkgid='-1'").hide();
 				}
 			});
 		};
 
-		this.parseStack = function(thread) {
+		this.parseStack = function (thread) {
 			var tid = "[tid=" + thread.header.id + "]";
 			var rootRow = jq(".thread-name-row" + tid);
 			var insertAfter = rootRow.prev();
@@ -261,7 +270,7 @@ var colors = 3;
 
 		}
 
-		this.onRefreshClick = function() {
+		this.onRefreshClick = function () {
 			that.getStack(jq(this).attr('tid'));
 		};
 	}
