@@ -72,6 +72,11 @@ Building is simple - download sources and run
 ```bash
 mvn install
 ```
+By default js/css files are minified using samaxes/minify-maven-plugin
+To disable minification run
+```
+mvn install -Pnomini
+```
 Also you can wath ETD in action without putting it in your application typing
 ```bash
 mvn jetty:run
