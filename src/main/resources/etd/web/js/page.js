@@ -130,6 +130,7 @@ var deadlocked = [];
 				var packageMatched = false;
 				if (localPackageNames.some(that.packageMatches(stackElem.line))) {
 					holder.addClass("localPackage");
+					holder.attr('tid', thread.header.id);
 					packageMatched = true;
 				} else {
 					for (var key in libs) {

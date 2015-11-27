@@ -11,6 +11,7 @@
     <script type="text/javascript" src="static/js/jquery.min.js"></script>
     <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="static/js/page.js"></script>
+    <script type="text/javascript" src="static/js/analyze.js"></script>
 </head>
 <body>
 
@@ -27,6 +28,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <form class="navbar-form navbar-right">
+                <input type="button" class="btn btn-default" value="Analyze" id="btnAnalyze">
                 <input type="button" class="btn btn-default" value="Download dump">
                 <input type="button" class="btn btn-info" value="Download 3 dumps">
             </form>
@@ -119,6 +121,22 @@
                 <div class="col-md-4">
                     <span class="tid"></span>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="analyzeModal" tabindex="-1" role="dialog" aria-labelledby="AnalyzeResults">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Results</h4>
+            </div>
+            <div class="modal-body">
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
