@@ -131,7 +131,7 @@ h3 > span {
 .package-stub-header {
 	display: none;
 	font-style: italic;
-	font-size: large;
+	font-size: small;
 	/*border: 1px dotted #ccc;*/
 }
 .btn-xss {
