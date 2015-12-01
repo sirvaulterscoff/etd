@@ -149,3 +149,10 @@ h3 > span {
 #analyzeModal .row {
 	border-bottom: 1px solid #eee;
 }
+
+.collapsed-row {
+	display: none;
+}
+.empty-hidden {
+	display: none !important;
+}

@@ -66,6 +66,7 @@ var deadlocked = [];
 			clonedRow.insertAfter(after ? after : originalHeader);
 			clonedRow.attr("tid", thread.header.id);
 			clonedRow.prop("id", "thread-" + thread.header.id);
+			clonedRow.addClass("thread-name-row");
 			clonedRow.show();
 
 			var state = jq(".tstate", clonedRow);
@@ -96,7 +97,7 @@ var deadlocked = [];
 			aTag.text(thread.header.name);
 			aTag.prop("href", "#" + thread.header.id);
 
-			if (thread.header.deadlocked=="true") {
+			if (thread.header.deadlocked == "true") {
 				var deadLockLabel = jq('<span>', {
 					"class": "label label-danger"
 				});
@@ -162,7 +163,7 @@ var deadlocked = [];
 								}
 								if (packageCheckBox.prop("checked") && groupRow) {
 									groupRow.show();
-									rootRowTag.hide();
+									rootRowTag.addClass("collapsed-row")
 								}
 							}
 						}
@@ -175,12 +176,13 @@ var deadlocked = [];
 					previousPackage = null;
 					rootRowTag.attr("pkgid", -1);
 					if (jq("input.unknown_package", checkboxGroup).prop("checked")) {
-						rootRowTag.hide();
+						rootRowTag.addClass("collapsed-row")
 					}
 				}
 				rootRowTag.insertAfter(groupRow ? groupRow : clonedRow);
 				rootRowTag.attr("tid", thread.header.id);
 			});
+			that.hideEmptyThreads(clonedRow);
 		};
 		this.packageMatches = function (line) {
 			return function (e) {
@@ -241,10 +243,10 @@ var deadlocked = [];
 					var colorNum = $this.attr("pkgid");
 					var condition = "[pkgid='" + colorNum + "']";
 					if ($this.prop("checked")) {
-						jq(".trace-elem" + condition).hide();
+						jq(".trace-elem" + condition).addClass("collapsed-row");
 						jq(".package-stub-header" + condition).show();
 					} else {
-						jq(".trace-elem" + condition).show();
+						jq(".trace-elem" + condition).removeClass("collapsed-row");
 						jq(".package-stub-header" + condition).hide();
 					}
 				});
@@ -263,9 +265,9 @@ var deadlocked = [];
 			checkBox_unknown.change(function () {
 				var $this = jq(this);
 				if ($this.prop("checked")) {
-					jq(".trace-elem[pkgid='-1']").hide();
+					jq(".trace-elem[pkgid='-1']").addClass("collapsed-row");
 				} else {
-					jq(".trace-elem[pkgid='-1']").show();
+					jq(".trace-elem[pkgid='-1']").removeClass("collapsed-row");
 				}
 			});
 		};
@@ -278,12 +280,47 @@ var deadlocked = [];
 			jq(".package-stub-header" + tid).remove();
 			jq(".trace-elem" + tid).remove();
 			that.parseThreadLine(thread, insertAfter);
-
 		}
 
 		this.onRefreshClick = function () {
 			that.getStack(jq(this).attr('tid'));
 		};
+
+		this.hideEmptyThreads = function (only) {
+			if (jq("#chkHideEmpty").prop("checked")) {
+				var checkThreads = only ? [only] : jq('.thread-name-row')
+				checkThreads.each(function (idx, threadHead) {
+					var shouldShow = false;
+					var toHide = [];
+					var next = jq(threadHead).next();
+					while (true) {
+						//once we reach next thread we stop iterating
+						if (next.hasClass("thread-name-row")) {
+							break;
+						} else if (next.hasClass("trace-elem") && !next.hasClass('collapsed-row')) {
+							shouldShow = true;
+							break;
+						} else {
+							toHide.push(next);
+							next = next.next();
+							if (next.length == 0) {
+								break;
+							}
+						}
+					}
+					if (!shouldShow) {
+						toHide.push(threadHead);
+						jq(toHide).each(function (idx, elem) {
+							jq(elem).addClass('empty-hidden');
+						});
+					}
+				});
+			} else {
+				jq(".thread-name-row").removeClass('empty-hidden');
+				jq(".package-stub-header").removeClass('empty-hidden');
+				jq(".trace-elem").removeClass('empty-hidden');
+			}
+		}
 	}
 
 	RestClient.prototype.fillVmInfo = function () {
@@ -307,8 +344,15 @@ var deadlocked = [];
 		restClient.fillVmInfo();
 		//get thread stacks
 		restClient.getStacks();
+		bindControls(restClient);
 
 	});
+	function bindControls(restClient) {
+		jq('#chkHideEmpty').change(function () {
+			restClient.hideEmptyThreads(null);
+		});
+	}
+
 	function percent(all, part) {
 		return (part / all * 100).toPrecision(3) + "%";
 	}

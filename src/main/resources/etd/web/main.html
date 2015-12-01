@@ -100,6 +100,11 @@
                         <input type="checkbox" id="chkCpuTime">Thread CPU time
                     </label>
                 </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="chkHideEmpty">Hide empty threads
+                    </label>
+                </div>
             </form>
             <h3 class="navheader"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span>Filters</h3>
 
@@ -109,7 +114,7 @@
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
             <h1 class="page-header">Dump</h1>
 
-            <div class="row thread-name-row" id="thread-template" style="display: none;">
+            <div class="row" id="thread-template" style="display: none;">
                 <div class="col-md-8">
                     <span class="tstate"></span>
                     <span class="h4"><a class="tname" href="#"></a>
