@@ -44,6 +44,7 @@ public class ThreadDumpServlet extends HttpServlet {
 				return;
 			}
 			final ServletOutputStream servletOutputStream = resp.getOutputStream();
+			resp.setCharacterEncoding("UTF-8");
 			transferBytes(servletOutputStream, resourceStream);
 		} else {
 			String restUri = getRestURI(req);
@@ -88,7 +89,7 @@ public class ThreadDumpServlet extends HttpServlet {
 			int bufferSize = Math.min(resourceAsStream.available(), BUFFER_SIZE);
 			byte[] buff = new byte[bufferSize];
 			result = resourceAsStream.read(buff);
-			servletOutputStream.write(buff);
+			servletOutputStream.write(buff, 0, result);
 		} while (result > 0);
 	}
 }
