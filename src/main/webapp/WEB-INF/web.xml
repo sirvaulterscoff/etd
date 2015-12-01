@@ -13,17 +13,17 @@
 		<init-param>
 			<param-name>etd_libs_mapping</param-name>
 			<param-value>
-				jetty=org\.eclipse\.jetty;
-				Java core=sun\.misc,^java\.;
-				SpringTransaction=^org\.springframework\.transaction\.support\.TransactionTemplate\.execute,^org\.springframework\.transaction\.interceptor\.TransactionInterceptor\.invoke,^org\.springframework\.transaction\.support\.TransactionCallbackWithoutResult\.doInTransaction;
-				Spring=^org\.springframework;
-				OracleJDBC=^oracle\.jdbc;
-				Hibernate=^org\.hibernate;
-				Weblogic portlet=^com\.bea\.(wsrp|portlet)\.,javax\.portlet\.;
-				Weblogic=^com\.bea\.,^weblogic\.;
-				Proxy=^com\.sun\.proxy\.;
-				Reflection=^java\.lang\.reflect\.,^sun\.reflect\.;
-				Socket-in=^java\.net\.SocketInputStream;
+				jetty=org\\.eclipse\\.jetty;
+				Java core=sun\\.misc,^java\\.;
+				SpringTransaction=^org\\.springframework\\.transaction\\.support\\.TransactionTemplate\\.execute,^org\\.springframework\\.transaction\\.interceptor\\.TransactionInterceptor\\.invoke,^org\\.springframework\\.transaction\\.support\\.TransactionCallbackWithoutResult\\.doInTransaction;
+				Spring=^org\\.springframework;
+				OracleJDBC=^oracle\\.jdbc;
+				Hibernate=^org\\.hibernate;
+				Weblogic portlet=^com\\.bea\\.(wsrp|portlet)\\.,javax\\.portlet\\.;
+				Weblogic=^com\\.bea\\.,^weblogic\\.;
+				Proxy=^com\\.sun\\.proxy\\.;
+				Reflection=^java\\.lang\\.reflect\\.,^sun\\.reflect\\.;
+				Socket-in=^java\\.net\\.SocketInputStream;
 			</param-value>
 		</init-param>
 	</servlet>
